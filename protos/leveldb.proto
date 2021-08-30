@@ -1,0 +1,130 @@
+syntax = "proto2";
+
+package leveldb.grpc;
+
+message Options {
+  enum CompressionType {
+    // NOTE: do not change the values of existing entries, as these are
+    // part of the persistent format on disk.
+    kNoCompression = 0;
+    kSnappyCompression = 1;
+  }
+  optional bool create_if_missing = 1 [default = false];
+  optional bool error_if_exists = 2 [default = false];
+  optional bool paranoid_checks = 3 [default = false];
+  optional fixed32 write_buffer_size = 4
+      [default = 4194304];  // 4 * 1024 * 1024
+  optional int32 max_open_files = 5 [default = 1000];
+  optional fixed32 block_size = 6 [default = 4096];  // 4 * 1024
+  optional int32 block_restart_interval = 7 [default = 16];
+  optional fixed32 max_file_size = 8 [default = 2097152];  // 2 * 1024 * 1024
+  optional CompressionType compression = 9 [default = kSnappyCompression];
+  optional bool reuse_logs = 10 [default = false];
+}
+
+message ReadOptions {
+  optional bool verify_checksums = 1;
+  optional bool fill_cache = 2;
+}
+
+message WriteOptions {
+  optional bool sync = 1 [default = false];
+}
+
+message Status {
+  enum Code {
+    kOk = 0;
+    kNotFound = 1;
+    kCorruption = 2;
+    kNotSupported = 3;
+    kInvalidArgument = 4;
+    kIOError = 5;
+  }
+  required Code code = 1;
+  required string message = 2;
+}
+
+message DB {
+  required string name = 1;
+}
+
+message DBReq {
+  required DB db = 1;
+  optional Options options = 2;
+  optional ReadOptions read_options = 3;
+  optional WriteOptions write_options = 4;
+  optional string key = 5;
+  optional string value = 6;
+  optional WriteBatch write_batch = 7;
+  optional Iterator iterator = 8;
+}
+
+message DBRes {
+  required Status status = 1;
+  optional string value = 2;
+  optional Iterator iterator = 3;
+}
+
+service DBRPC {
+  rpc Open(DBReq) returns (DBRes);
+  rpc Close(DBReq) returns (DBRes);
+  rpc Put(DBReq) returns (DBRes);
+  rpc Delete(DBReq) returns (DBRes);
+  rpc Write(DBReq) returns (DBRes);
+  rpc Get(DBReq) returns (DBRes);
+  rpc NewIterator(DBReq) returns (DBRes);
+  rpc DestroyIterator(DBReq) returns (DBRes);
+  rpc Destroy(DBReq) returns (DBRes);
+  rpc Repair(DBReq) returns (DBRes);
+}
+
+message WriteBatch {
+  required string name = 1;
+}
+
+message WriteBatchReq {
+  required WriteBatch write_batch = 1;
+  optional string key = 2;
+  optional string value = 3;
+  optional WriteBatch write_batch_append = 4;
+}
+
+message WriteBatchRes {
+  required Status status = 1;
+}
+
+service WriteBatchRPC {
+  rpc Create(WriteBatchReq) returns (WriteBatchRes);
+  rpc Destroy(WriteBatchReq) returns (WriteBatchRes);
+  rpc Clear(WriteBatchReq) returns (WriteBatchRes);
+  rpc Put(WriteBatchReq) returns (WriteBatchRes);
+  rpc Delete(WriteBatchReq) returns (WriteBatchRes);
+  rpc Append(WriteBatchReq) returns (WriteBatchRes);
+}
+
+message Iterator {
+  required string name = 1;
+}
+
+message IteratorReq {
+  required Iterator iterator = 1;
+  optional string target_key = 3;
+}
+
+message IteratorRes {
+  optional Status status = 1;
+  optional bool valid = 2;
+  optional string key = 3;
+  optional string value = 4;
+}
+
+service IteratorRPC {
+  rpc Valid(IteratorReq) returns (IteratorRes);
+  rpc SeekToFirst(IteratorReq) returns (IteratorRes);
+  rpc SeekToLast(IteratorReq) returns (IteratorRes);
+  rpc Seek(IteratorReq) returns (IteratorRes);
+  rpc Next(IteratorReq) returns (IteratorRes);
+  rpc Prev(IteratorReq) returns (IteratorRes);
+  rpc Key(IteratorReq) returns (IteratorRes);
+  rpc Value(IteratorReq) returns (IteratorRes);
+}
