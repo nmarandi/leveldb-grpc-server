@@ -1,0 +1,51 @@
+# Build matrix / environment variables are explained on:
+# https://www.appveyor.com/docs/appveyor-yml/
+# This file can be validated on: https://ci.appveyor.com/tools/validate-yaml
+
+version: "{build}"
+
+environment:
+  matrix:
+    # AppVeyor currently has no custom job name feature.
+    # http://help.appveyor.com/discussions/questions/1623-can-i-provide-a-friendly-name-for-jobs
+    - JOB: Visual Studio 2019
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      CMAKE_GENERATOR: Visual Studio 16 2019
+      PYTHON: "C:\\Python36"
+      PYTHON_VERSION: 3.6
+      PYTHON_ARCH: 32
+
+platform:
+  - x86
+  - x64
+
+init:
+  - ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%
+
+install:
+  - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
+  - echo "Downloading conan..."
+  - pip.exe install conan
+  - conan user # Create the conan data directory
+  - conan --version
+
+configuration:
+  - RelWithDebInfo
+  - Debug
+
+build_script:
+  - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
+  - git submodule update --init --recursive
+  - mkdir build
+  - cd build
+  - conan install ..
+  - if "%platform%"=="x86" (set CMAKE_GENERATOR_PLATFORM="Win32")
+    else (set CMAKE_GENERATOR_PLATFORM="%platform%")
+  - cmake --version
+  - cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake -G "%CMAKE_GENERATOR%" -A "%CMAKE_GENERATOR_PLATFORM%"
+    -DCMAKE_CONFIGURATION_TYPES="%CONFIGURATION%"
+  - cmake --build . --config "%CONFIGURATION%"
+  - cd ..
+
+test_script:
+  - cd build && ctest --verbose --build-config "%CONFIGURATION%" && cd ..

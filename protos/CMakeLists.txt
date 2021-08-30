@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project(proto-types VERSION 1.0 LANGUAGES CXX)
 find_package(Protobuf)
+include_directories(${PROTOBUF_INCLUDE_DIRS})
 
 set(MODULE_NAME ${PROJECT_NAME})
 set(CMAKE_CXX_STANDARD 14)
