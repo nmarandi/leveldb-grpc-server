@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(proto-types VERSION 1.0 LANGUAGES CXX)
-find_package(Protobuf)
+find_package(Protobuf CONFIG REQUIRED)
 include_directories(${PROTOBUF_INCLUDE_DIRS})
 
 set(MODULE_NAME ${PROJECT_NAME})
@@ -12,7 +12,7 @@ file(GLOB PROTO_FILES *.proto)
 set(PROTOS_SRC "")
 set(PPTH --proto_path=${CMAKE_CURRENT_SOURCE_DIR})
 
-find_package(gRPC)
+find_package(gRPC CONFIG REQUIRED)
 message(STATUS "Using gRPC ${gRPC_VERSION}")
 
 set(_GRPC_GRPCPP_UNSECURE gRPC::grpc++_unsecure)
@@ -87,7 +87,7 @@ endforeach(PROTO_FILE ${PROTO_FILES})
 file(GLOB SRCS *.cc)
 
 add_library(${MODULE_NAME} ${PROTOS_SRC} ${SRCS})
-target_link_libraries(${MODULE_NAME} ${PROTOBUF_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} grpc++_unsecure grpc++)
+target_link_libraries(${MODULE_NAME} protobuf::libprotobuf ${CMAKE_THREAD_LIBS_INIT} gRPC::grpc gRPC::grpc++)
 
 
 target_include_directories(${MODULE_NAME}

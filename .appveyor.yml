@@ -19,15 +19,18 @@ platform:
   - x86
   - x64
 
+cache: c:\tools\vcpkg\installed\
+
 init:
   - ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%
 
 install:
-  - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
-  - echo "Downloading conan..."
-  - pip.exe install conan
-  - conan user # Create the conan data directory
-  - conan --version
+  - cd C:\Tools\vcpkg
+  - git pull
+  - .\bootstrap-vcpkg.bat
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - vcpkg install grpc:x86-windows
+  - vcpkg install grpc:x64-windows
 
 configuration:
   - RelWithDebInfo
@@ -38,11 +41,10 @@ build_script:
   - git submodule update --init --recursive
   - mkdir build
   - cd build
-  - conan install ..
   - if "%platform%"=="x86" (set CMAKE_GENERATOR_PLATFORM="Win32")
     else (set CMAKE_GENERATOR_PLATFORM="%platform%")
   - cmake --version
-  - cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake -G "%CMAKE_GENERATOR%" -A "%CMAKE_GENERATOR_PLATFORM%"
+  - cmake .. -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake -G "%CMAKE_GENERATOR%" -A "%CMAKE_GENERATOR_PLATFORM%"
     -DCMAKE_CONFIGURATION_TYPES="%CONFIGURATION%"
   - cmake --build . --config "%CONFIGURATION%"
   - cd ..
