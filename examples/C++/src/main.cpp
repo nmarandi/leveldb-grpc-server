@@ -61,7 +61,11 @@ int main(int argc, char** argv)
     //leveldbStatusCheck(dbclient.Delete(db_name, "Hello"));
     // *********************************************
     std::string wb_name = "example_wb";
-    leveldbStatusCheck(wbclient.Create(wb_name));
+    auto status = wbclient.Create(wb_name); 
+    if (status.code() != leveldb::grpc::Status_Code::Status_Code_kOk && status.code() != leveldb::grpc::Status_Code::Status_Code_kInvalidArgument) {
+        std::cout << status.message() << std::endl;
+        exit(-1);
+    }
     leveldbStatusCheck(wbclient.Put(wb_name, "FOO", "BAR"));
     leveldbStatusCheck(wbclient.Put(wb_name, "foo", "bar"));
     leveldbStatusCheck(dbclient.Write(db_name, woptions, wb_name));
@@ -76,7 +80,11 @@ int main(int argc, char** argv)
     // *********************************************
     std::string it_name = "example_it";
     leveldb::grpc::ReadOptions ropts;
-    leveldbStatusCheck(dbclient.NewIterator(db_name, ropts, it_name));
+    status = dbclient.NewIterator(db_name, ropts, it_name);
+    if (status.code() != leveldb::grpc::Status_Code::Status_Code_kOk && status.code() != leveldb::grpc::Status_Code::Status_Code_kInvalidArgument) {
+        std::cout << status.message() << std::endl;
+        exit(-1);
+    }
     leveldbStatusCheck(itclient.SeekToFirst(it_name));
     bool valid;
     leveldbStatusCheck(itclient.Valid(it_name, &valid));

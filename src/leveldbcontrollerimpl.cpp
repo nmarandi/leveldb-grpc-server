@@ -136,7 +136,7 @@ WriteBatchController::~WriteBatchController()
 
 Status WriteBatchController::Create(const std::string& wbname)
 {
-    Status status = Status::InvalidArgument(wbname, "exists");
+    Status status = Status::InvalidArgument(wbname, "does exist");
     if ( _wbs.find(wbname) == _wbs.end() ) {
         status = Status::OK();
         _wbs[wbname] = std::shared_ptr<WriteBatch>(new WriteBatch());
@@ -146,7 +146,7 @@ Status WriteBatchController::Create(const std::string& wbname)
 
 Status WriteBatchController::Destroy(const std::string& wbname)
 {
-    Status status = Status::NotFound(wbname, "does exist");
+    Status status = Status::NotFound(wbname, "does not exist");
     auto wb = _wbs.find(wbname);
     if ( wb != _wbs.end() ) {
         status = Status::OK();
@@ -188,7 +188,7 @@ Status WriteBatchController::Append(const std::string& wbname, const std::string
 
 Status WriteBatchController::getWriteBatch(const std::string& wbname, WriteBatch** wb)
 {
-    Status status = Status::NotFound(wbname, "does exist");
+    Status status = Status::NotFound(wbname, "does not exist");
     auto wb_ = _wbs.find(wbname);
     if ( wb_ != _wbs.end() ) {
         status = Status::OK();
@@ -267,7 +267,7 @@ Status IteratorController::Value(const std::string& itname, std::string* value)
 
 Status IteratorController::addIterator(const std::string& itname, std::shared_ptr<Iterator> it)
 {
-    Status status = Status::NotFound(itname, "does exist");
+    Status status = Status::InvalidArgument(itname, "does exist");
     auto it_ = _its.find(itname);
     if ( it_ == _its.end() ) {
         status = Status::OK();
