@@ -1,18 +1,18 @@
 cmake_minimum_required(VERSION 3.5)
-project(leveldb-grpc-client-example)
+project(leveldb-grpc-client)
 
 file(GLOB SOURCES src/*.cpp)
 
 include_directories(include)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_library(${PROJECT_NAME} ${SOURCES})
 
-target_link_libraries(${PROJECT_NAME} proto-types leveldb-grpc-client)
+target_link_libraries(${PROJECT_NAME} proto-types)
 
 target_include_directories(${PROJECT_NAME}
 	PUBLIC
-	    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+	    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 	    $<INSTALL_INTERFACE:include>
         PRIVATE
     )

@@ -4,124 +4,19 @@
 
 #include <grpcpp/grpcpp.h>
 
-#include "protos/leveldb.grpc.pb.h"
+#include "client.h"
 
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::Status;
-using namespace leveldb::grpc;
 
-inline void leveldbStatusExceptionOnError(leveldb::grpc::Status status)
+inline void leveldbStatusCheck(leveldb::grpc::Status status)
 {
-    if (status.code() != Status_Code::Status_Code_kOk) {
-        std::cout << status.message();
+    if (status.code() != leveldb::grpc::Status_Code::Status_Code_kOk) {
+        std::cout << status.message() << std::endl;
         exit(-1);
     }
 }
-class DBClient
-{
-public:
-    DBClient(std::shared_ptr<Channel> channel)
-        : stub_(DBRPC::NewStub(channel)) {}
-
-    leveldb::grpc::Status Open(const std::string& db_name)
-    {
-        DBReq request;
-        DB* db = new DB();
-        db->set_name(db_name);
-        request.set_allocated_db(db);
-        Options* options = new Options();
-        options->set_create_if_missing(true);
-        request.set_allocated_options(options);
-
-        DBRes reply;
-        ClientContext context;
-
-        ::grpc::Status status = stub_->Open(&context, request, &reply);
-
-        if (status.ok()) {
-            return reply.status();
-        }
-        leveldb::grpc::Status leveldbstatus;
-        leveldbstatus.set_code(Status_Code::Status_Code_kIOError);
-        leveldbstatus.set_message(status.error_message());
-        return leveldbstatus;
-    }
-
-    leveldb::grpc::Status Put(const std::string& db_name, const std::string& key, const std::string& value)
-    {
-        DBReq request;
-        DB* db = new DB();
-        db->set_name(db_name);
-        request.set_allocated_db(db);
-        request.set_key(key);
-        request.set_value(value);
-
-        DBRes reply;
-        ClientContext context;
-
-        ::grpc::Status status = stub_->Put(&context, request, &reply);
-
-        if (status.ok()) {
-            return reply.status();
-        }
-        leveldb::grpc::Status leveldbstatus;
-        leveldbstatus.set_code(Status_Code::Status_Code_kIOError);
-        leveldbstatus.set_message(status.error_message());
-        return leveldbstatus;
-    }
-
-    leveldb::grpc::Status Get(const std::string& db_name, const std::string& key, std::string* value)
-    {
-        DBReq request;
-        DB* db = new DB();
-        db->set_name(db_name);
-        request.set_allocated_db(db);
-        request.set_key(key);
-
-        DBRes reply;
-        ClientContext context;
-
-        ::grpc::Status status = stub_->Get(&context, request, &reply);
-
-        if (status.ok()) {
-
-            if (reply.status().code() == Status_Code::Status_Code_kOk) {
-                *value = reply.value();
-            }
-            return reply.status();
-        }
-        leveldb::grpc::Status leveldbstatus;
-        leveldbstatus.set_code(Status_Code::Status_Code_kIOError);
-        leveldbstatus.set_message(status.error_message());
-        return leveldbstatus;
-    }
-
-    leveldb::grpc::Status Delete(const std::string& db_name, const std::string& key)
-    {
-        DBReq request;
-        DB* db = new DB();
-        db->set_name(db_name);
-        request.set_allocated_db(db);
-        request.set_key(key);
-
-        DBRes reply;
-        ClientContext context;
-
-        ::grpc::Status status = stub_->Delete(&context, request, &reply);
-
-        if (status.ok()) {
-            return reply.status();
-        }
-        leveldb::grpc::Status leveldbstatus;
-        leveldbstatus.set_code(Status_Code::Status_Code_kIOError);
-        leveldbstatus.set_message(status.error_message());
-        return leveldbstatus;
-    }
-
-private:
-    std::unique_ptr<DBRPC::Stub> stub_;
-};
 
 int main(int argc, char** argv)
 {
@@ -148,13 +43,51 @@ int main(int argc, char** argv)
     }
     DBClient dbclient(
         grpc::CreateChannel(target_str, grpc::InsecureChannelCredentials()));
+    WriteBatchClient wbclient(
+        grpc::CreateChannel(target_str, grpc::InsecureChannelCredentials()));
+    IteratorClient itclient(
+        grpc::CreateChannel(target_str, grpc::InsecureChannelCredentials()));
+    // *********************************************
     std::string db_name = "example_db";
-    leveldbStatusExceptionOnError(dbclient.Open(db_name));
-    leveldbStatusExceptionOnError(dbclient.Put(db_name, "Hello", "World"));
+    leveldb::grpc::Options options;
+    options.set_create_if_missing(true);
+    leveldbStatusCheck(dbclient.Open(db_name, options));
+    leveldb::grpc::WriteOptions woptions;
+    leveldbStatusCheck(dbclient.Put(db_name, woptions, "Hello", "World"));
     std::string value;
-    leveldbStatusExceptionOnError(dbclient.Get(db_name, "Hello", &value));
+    leveldb::grpc::ReadOptions roptions;
+    leveldbStatusCheck(dbclient.Get(db_name, roptions, "Hello", &value));
     std::cout << "value for \"Hello\" key: " << value << std::endl;
-    leveldbStatusExceptionOnError(dbclient.Delete(db_name, "Hello"));
+    //leveldbStatusCheck(dbclient.Delete(db_name, "Hello"));
+    // *********************************************
+    std::string wb_name = "example_wb";
+    leveldbStatusCheck(wbclient.Create(wb_name));
+    leveldbStatusCheck(wbclient.Put(wb_name, "FOO", "BAR"));
+    leveldbStatusCheck(wbclient.Put(wb_name, "foo", "bar"));
+    leveldbStatusCheck(dbclient.Write(db_name, woptions, wb_name));
+    leveldbStatusCheck(dbclient.Get(db_name, roptions, "FOO", &value));
+    std::cout << "value for \"FOO\" key: " << value << std::endl;
+    leveldbStatusCheck(dbclient.Get(db_name, roptions, "foo", &value));
+    std::cout << "value for \"foo\" key: " << value << std::endl;
+    //leveldbStatusCheck(wbclient.Clear(wb_name));
+    //leveldbStatusCheck(wbclient.Delete(wb_name, "FOO"));
+    //leveldbStatusCheck(wbclient.Delete(wb_name, "foo"));
+    //leveldbStatusCheck(dbclient.Write(db_name, wb_name));
+    // *********************************************
+    std::string it_name = "example_it";
+    leveldb::grpc::ReadOptions ropts;
+    leveldbStatusCheck(dbclient.NewIterator(db_name, ropts, it_name));
+    leveldbStatusCheck(itclient.SeekToFirst(it_name));
+    bool valid;
+    leveldbStatusCheck(itclient.Valid(it_name, &valid));
+    std::string key;
+    while (valid) {
+        leveldbStatusCheck(itclient.Key(it_name, &key));
+        leveldbStatusCheck(itclient.Value(it_name, &value));
+        std::cout << "value for \"" << key << "\" key: " << value << std::endl;
+        leveldbStatusCheck(itclient.Next(it_name));
+        leveldbStatusCheck(itclient.Valid(it_name, &valid));
+    }
 
     return 0;
 }

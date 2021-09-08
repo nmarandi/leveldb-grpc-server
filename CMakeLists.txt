@@ -24,6 +24,7 @@ target_include_directories(${PROJECT_NAME}
 option(LEVELDB_BUILD_GRPC_SERVER_EXAMPLE "Build LevelDB's GRPC Server example" ON)
 
 if(LEVELDB_BUILD_GRPC_SERVER_EXAMPLE)
+  add_subdirectory(clients)
   add_subdirectory(examples)
 endif(LEVELDB_BUILD_GRPC_SERVER_EXAMPLE)
 # This makes the project importable from the build directory
