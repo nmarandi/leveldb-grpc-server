@@ -118,7 +118,6 @@ grpc::Status* createGrpcStatusFromStatus(const Status& status)
 ::grpc::Status DBService::NewIterator(::grpc::ServerContext* context, const grpc::DBReq* request, grpc::DBRes* response)
 {
     ReadOptions read_option = createReadOptionFromMessage(request->read_options());
-    \
     auto status = _dbcontroller->NewIterator(request->db().name(), read_option, request->iterator().name());
     grpc::Iterator* iterator = new grpc::Iterator();
     iterator->set_name(request->iterator().name());

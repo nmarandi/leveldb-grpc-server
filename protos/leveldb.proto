@@ -23,8 +23,8 @@ message Options {
 }
 
 message ReadOptions {
-  optional bool verify_checksums = 1;
-  optional bool fill_cache = 2;
+  optional bool verify_checksums = 1 [default = false];
+  optional bool fill_cache = 2 [default = true];
 }
 
 message WriteOptions {
