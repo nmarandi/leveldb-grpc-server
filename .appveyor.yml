@@ -17,7 +17,6 @@ platform:
 
 cache: 
   - c:\tools\vcpkg\installed\
-  - C:\projects\leveldb-grpc-server\build\
 
 install:
   - cd C:\Tools\vcpkg
