@@ -33,7 +33,7 @@ configuration:
 
 build_script:
   - git submodule update --init --recursive
-  - mkdir build
+  - mkdir build 2> NUL
   - cd build
   - if "%platform%"=="x86" (set CMAKE_GENERATOR_PLATFORM="Win32")
     else (set CMAKE_GENERATOR_PLATFORM="%platform%")
