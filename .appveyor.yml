@@ -31,7 +31,6 @@ configuration:
   - RelWithDebInfo
 
 build_script:
-  - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
   - git submodule update --init --recursive
   - mkdir build
   - cd build
