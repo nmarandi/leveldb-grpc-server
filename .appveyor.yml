@@ -15,8 +15,8 @@ environment:
 platform:
   - x64
 
-cache: c:\tools\vcpkg\installed\
-
+cache: 
+  - c:\tools\vcpkg\installed\
 
 install:
   - cd C:\Tools\vcpkg
