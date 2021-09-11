@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(leveldb-grpc-server)
+include(CTest)
 
 file(GLOB SOURCES src/*.cpp)
 
