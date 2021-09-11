@@ -11,25 +11,20 @@ environment:
     - JOB: Visual Studio 2019
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       CMAKE_GENERATOR: Visual Studio 16 2019
-      PYTHON: "C:\\Python36"
-      PYTHON_VERSION: 3.6
-      PYTHON_ARCH: 32
 
 platform:
-  - x86
   - x64
 
 cache: c:\tools\vcpkg\installed\
 
-init:
-  - ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%
 
 install:
   - cd C:\Tools\vcpkg
   - git pull
   - .\bootstrap-vcpkg.bat
+  - SET CONFIGURATION=release
+  - echo.set(VCPKG_BUILD_TYPE %CONFIGURATION%)>> C:\Tools\vcpkg\triplets\x64-windows.cmake
   - cd %APPVEYOR_BUILD_FOLDER%
-  - vcpkg install grpc:x86-windows
   - vcpkg install grpc:x64-windows
 
 configuration:
