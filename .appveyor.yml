@@ -29,7 +29,6 @@ install:
 
 configuration:
   - RelWithDebInfo
-  - Debug
 
 build_script:
   - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
