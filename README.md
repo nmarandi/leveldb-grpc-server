@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/github/nmarandi/leveldb-grpc-server?branch=main&svg=true)](https://ci.appveyor.com/api/projects/status/github/nmarandi/)
+
 **simple GRPC server for [LevelDB](https://github.com/google/leveldb)**
 
 # Features not supported yet from LevelDB
