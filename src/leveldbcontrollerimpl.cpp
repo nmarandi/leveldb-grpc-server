@@ -265,6 +265,20 @@ Status IteratorController::Value(const std::string& itname, std::string* value)
     return status;
 }
 
+Status IteratorController::Iterate(const std::string& itname, std::string* key, std::string* value, bool *valid)
+{
+    Iterator* it;
+    auto status = getIterator(itname, &it);
+    if (status.ok()) {
+        status = Status::OK();
+        *value = it->value().ToString();
+        *key = it->key().ToString();
+        it->Next();
+        *valid = it->Valid();
+    }
+    return status;
+}
+
 Status IteratorController::addIterator(const std::string& itname, std::shared_ptr<Iterator> it)
 {
     Status status = Status::InvalidArgument(itname, "does exist");

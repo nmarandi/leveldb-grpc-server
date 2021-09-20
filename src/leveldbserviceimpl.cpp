@@ -275,4 +275,17 @@ IteratorService::~IteratorService()
     return ::grpc::Status::OK;
 }
 
+::grpc::Status IteratorService::Iterate(::grpc::ServerContext* context, const grpc::IteratorReq* request, grpc::IteratorRes* response)
+{
+    std::string value;
+    std::string key;
+    bool valid;
+    auto status = _itcontroller->Iterate(request->iterator().name(), &key, &value, &valid);
+    response->set_allocated_status(createGrpcStatusFromStatus(status));
+    response->set_value(value);
+    response->set_key(key);
+    response->set_valid(valid);
+    return ::grpc::Status::OK;
+}
+
 } // namespace leveldb

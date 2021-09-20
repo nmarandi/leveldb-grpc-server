@@ -54,6 +54,7 @@ public:
     virtual ::grpc::Status Prev(::grpc::ServerContext* context, const grpc::IteratorReq* request, grpc::IteratorRes* response)override;
     virtual ::grpc::Status Key(::grpc::ServerContext* context, const grpc::IteratorReq* request, grpc::IteratorRes* response)override;
     virtual ::grpc::Status Value(::grpc::ServerContext* context, const grpc::IteratorReq* request, grpc::IteratorRes* response)override;
+    virtual ::grpc::Status Iterate(::grpc::ServerContext* context, const grpc::IteratorReq* request, grpc::IteratorRes* response)override;
 private:
     IIteratorController* _itcontroller;
 };

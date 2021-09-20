@@ -50,6 +50,7 @@ public:
     leveldb::grpc::Status Prev(const std::string& itname);
     leveldb::grpc::Status Key(const std::string& itname, std::string* key);
     leveldb::grpc::Status Value(const std::string& itname, std::string* value);
+    leveldb::grpc::Status Iterate(const std::string& itname, std::string* key, std::string* value, bool *valid);
 
 private:
     std::unique_ptr<leveldb::grpc::IteratorRPC::Stub> stub_;

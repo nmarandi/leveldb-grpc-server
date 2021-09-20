@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(proto-types VERSION 1.0 LANGUAGES CXX)
+project(protos VERSION 1.0 LANGUAGES CXX)
 find_package(Protobuf REQUIRED)
 include_directories(${PROTOBUF_INCLUDE_DIRS})
 

@@ -127,4 +127,5 @@ service IteratorRPC {
   rpc Prev(IteratorReq) returns (IteratorRes);
   rpc Key(IteratorReq) returns (IteratorRes);
   rpc Value(IteratorReq) returns (IteratorRes);
+  rpc Iterate(IteratorReq) returns (IteratorRes);
 }

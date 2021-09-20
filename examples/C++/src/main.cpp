@@ -90,11 +90,8 @@ int main(int argc, char** argv)
     leveldbStatusCheck(itclient.Valid(it_name, &valid));
     std::string key;
     while (valid) {
-        leveldbStatusCheck(itclient.Key(it_name, &key));
-        leveldbStatusCheck(itclient.Value(it_name, &value));
+        leveldbStatusCheck(itclient.Iterate(it_name, &key, &value, &valid));
         std::cout << "value for \"" << key << "\" key: " << value << std::endl;
-        leveldbStatusCheck(itclient.Next(it_name));
-        leveldbStatusCheck(itclient.Valid(it_name, &valid));
     }
 
     return 0;

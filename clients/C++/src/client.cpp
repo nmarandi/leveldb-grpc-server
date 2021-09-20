@@ -496,3 +496,24 @@ leveldb::grpc::Status IteratorClient::Value(const std::string& itname, std::stri
     }
     return grpc_error_to_leveldb_status(status);
 }
+
+leveldb::grpc::Status IteratorClient::Iterate(const std::string& itname, std::string* key, std::string* value, bool *valid)
+{
+    IteratorReq request;
+    Iterator* it = new Iterator();
+    it->set_name(itname);
+    request.set_allocated_iterator(it);
+
+    IteratorRes reply;
+    ClientContext context;
+
+    ::grpc::Status status = stub_->Iterate(&context, request, &reply);
+
+    if (status.ok()) {
+        *value = reply.value();
+        *key = reply.key();
+        *valid = reply.valid();
+        return reply.status();
+    }
+    return grpc_error_to_leveldb_status(status);
+}

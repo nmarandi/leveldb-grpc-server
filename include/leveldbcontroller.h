@@ -53,6 +53,7 @@ public:
     virtual Status Prev(const std::string& itname) = 0;
     virtual Status Key(const std::string& itname, std::string* key) = 0;
     virtual Status Value(const std::string& itname, std::string* value) = 0;
+    virtual Status Iterate(const std::string& itname, std::string* key, std::string* value, bool *valid) = 0;
 };
 }
 

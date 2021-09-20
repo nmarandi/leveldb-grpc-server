@@ -8,7 +8,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-target_link_libraries(${PROJECT_NAME} proto-types leveldb-grpc-client)
+target_link_libraries(${PROJECT_NAME} protos leveldb-grpc-client)
 
 target_include_directories(${PROJECT_NAME}
 	PUBLIC

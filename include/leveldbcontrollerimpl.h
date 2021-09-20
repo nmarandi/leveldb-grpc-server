@@ -65,6 +65,7 @@ public:
     virtual Status Prev(const std::string& itname)override;
     virtual Status Key(const std::string& itname, std::string* key)override;
     virtual Status Value(const std::string& itname, std::string* value)override;
+    virtual Status Iterate(const std::string& itname, std::string* key, std::string* value, bool *valid) override;
 private:
     friend class DBController;
     Status addIterator(const std::string& itname, std::shared_ptr<Iterator> it);
