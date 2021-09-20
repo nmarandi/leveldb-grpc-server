@@ -269,7 +269,7 @@ IteratorService::~IteratorService()
 ::grpc::Status IteratorService::Value(::grpc::ServerContext* context, const grpc::IteratorReq* request, grpc::IteratorRes* response)
 {
     std::string value;
-    auto status = _itcontroller->Key(request->iterator().name(), &value);
+    auto status = _itcontroller->Value(request->iterator().name(), &value);
     response->set_allocated_status(createGrpcStatusFromStatus(status));
     response->set_value(value);
     return ::grpc::Status::OK;
